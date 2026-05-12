@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Lumina Launcher</title>
+    <style>
+        :root { --primary-green: #5cb85c; --text-gold: #ffaa00; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #121212; color: white; user-select: none; overflow: hidden; }
+        .wrapper { display: flex; height: 100vh; flex-direction: column; }
+        .main-content { display: flex; flex: 1; background: url('assets/arayuz.png') no-repeat center; background-size: cover; position: relative; }
+
+        /* SOL HABER SÜTUNU */
+        .news-section { display: flex; flex-direction: column; justify-content: stretch; padding: 0; z-index: 2; }
+        .news-card { 
+            background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(12px); padding: 40px 25px; 
+            border-right: 1px solid rgba(255, 170, 0, 0.2); width: 320px; height: 100%; 
+            overflow-y: auto; box-shadow: 15px 0 35px rgba(0,0,0,0.6); box-sizing: border-box;
+        }
+        .news-card::-webkit-scrollbar { width: 3px; }
+        .news-card::-webkit-scrollbar-thumb { background: var(--text-gold); }
+
+        .spacer { flex: 1.5; }
+
+        /* SAĞ PANEL */
+        .login-section { 
+            flex: 1; background: rgba(20, 20, 20, 0.88); backdrop-filter: blur(15px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            padding: 30px; box-shadow: -15px 0 35px rgba(0,0,0,0.8); z-index: 2;
+        }
+        .logo-text { font-size: 50px; font-weight: 900; color: var(--text-gold); margin-bottom: 50px; letter-spacing: -2px; }
+        input { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 14px; border-radius: 6px; outline: none; margin-bottom: 20px; box-sizing: border-box; transition: 0.2s; }
+        input:focus { border-color: var(--text-gold); }
+        
+        .btn-group { display: flex; gap: 15px; width: 100%; }
+        .secondary-btn { flex: 1; background: rgba(255, 255, 255, 0.05); color: #ccc; border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 13px; font-weight: 600; }
+        .secondary-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; transform: translateY(-2px); }
+
+        /* ALT BAR */
+        .bottom-bar { height: 120px; background: #1a1a1a; display: flex; align-items: center; justify-content: space-between; padding: 0 60px; border-top: 2px solid #2a2a2a; z-index: 3; }
+        .play-button { background: linear-gradient(135deg, #72c672 0%, var(--primary-green) 100%); border: none; color: white; padding: 20px 100px; font-size: 28px; font-weight: 800; cursor: pointer; border-radius: 10px; box-shadow: 0 8px 25px rgba(92, 184, 92, 0.4); text-transform: uppercase; transition: 0.2s; }
+        .play-button:hover { transform: translateY(-3px) scale(1.02); }
+
+        select { background: #2a2a2a; color: white; border: 1px solid #3a3a3a; padding: 12px; border-radius: 6px; width: 220px; outline: none; }
+        
+        #settings-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; background: #1e1e1e; padding: 30px; border-radius: 12px; z-index: 100; border-top: 3px solid var(--text-gold); box-shadow: 0 20px 50px rgba(0,0,0,0.9); }
+        .modal-btn { background: var(--primary-green); border: none; color: white; padding: 14px; width: 100%; margin-top: 25px; cursor: pointer; border-radius: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="main-content">
+            <div id="settings-modal">
+                <div style="font-weight:bold; color:var(--text-gold); text-align:center; margin-bottom:20px; font-size:18px;">LUMINA AYARLAR</div>
+                <label style="font-size:12px; color:#888;">RAM (GB):</label>
+                <select id="ram-select" style="width:100%; margin-bottom:15px;">
+                    <option value="2G">2 GB</option>
+                    <option value="4G" selected>4 GB</option>
+                    <option value="8G">8 GB</option>
+                </select>
+                <div style="font-size:13px; color:#ccc; display:flex; flex-direction:column; gap:8px;">
+                    <label><input type="checkbox" id="show-snapshots"> Snapshotları Göster</label>
+                    <label><input type="checkbox" id="show-alpha-beta"> Alpha & Beta Göster</label>
+                </div>
+                <button class="modal-btn" onclick="saveAndReload()">AYARLARI KAYDET</button>
+            </div>
+
+            <div class="news-section">
+                <div class="news-card">
+                    <h3 style="margin:0 0 20px 0; color:var(--text-gold); font-size:16px; text-transform:uppercase; border-bottom: 1px solid rgba(255,170,0,0.3); padding-bottom:10px;">Güncelleme Notları</h3>
+                    <div id="news-list"></div>
+                </div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div class="login-section">
+                <div class="logo-text">LUMINA</div>
+                <input type="text" id="username" placeholder="Oyuncu Adı">
+                <div class="btn-group">
+                    <button onclick="openSettings()" class="secondary-btn">⚙️ Ayarlar</button>
+                    <button onclick="openFolder()" class="secondary-btn">📁 Dosyalar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div><label style="font-size:12px; color:#777;">Sürüm Seç</label><br><select id="version"></select></div>
+            <button class="play-button" id="playBtn">OYUNA GİR</button>
+            <div style="text-align:right;"><span id="status-text" style="color:var(--text-gold); font-weight:bold;">Hazır</span><br><small style="color:#555; font-size:10px;">Lumina v1.0</small></div>
+        </div>
+    </div>
+    <script src="renderer.js"></script>
+</body>
+</html>

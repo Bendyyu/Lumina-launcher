@@ -1,0 +1,29 @@
+{
+  "name": "lumina-launcher",
+  "productName": "Lumina Launcher",
+  "version": "1.0.0",
+  "description": "Profesyonel Minecraft Launcher",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.lumina.launcher",
+    "productName": "Lumina Launcher",
+    "win": {
+      "target": "portable",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "dependencies": {
+    "minecraft-launcher-core": "^3.2.2"
+  },
+  "devDependencies": {
+    "electron": "^25.0.0",
+    "electron-builder": "^26.8.1"
+  }
+}
